@@ -29,6 +29,8 @@ I have tested this with Enterprise Hipchat version, It is not tested against pub
 
 ## ChatOps Collector properties file
 
+See the Jasypt Spring boot [documentation](https://github.com/ulisesbocchio/jasypt-spring-boot) for more information on configuring encrypted properties and the Jasypt [documentation](http://www.jasypt.org/encrypting-passwords.html) for more information on creating encrypted passwords.
+
 ```properties
 # Database Name
 dbname=dashboard
@@ -51,6 +53,9 @@ dbpassword=dbpass
 
 # Logging File location
 logging.file=./logs/chatops.log
+
+#Jasypt encryption password
+jasypt.encryptor.password=password
 
 chatops.cron=5 * * * * *
 ```

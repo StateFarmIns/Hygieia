@@ -19,12 +19,15 @@ package com.capitalone.dashboard;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+
 /**
  * Application configuration and bootstrap
  * 
  * @author KFK884
  */
 @SpringBootApplication
+@EnableEncryptableProperties
 //@EnableWebMvc
 public class Application {
 	/**

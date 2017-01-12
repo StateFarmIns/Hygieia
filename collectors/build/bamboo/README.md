@@ -18,6 +18,8 @@ java -JAR bamboo-build-collector.jar
 
 You will need to provide an **application.properties** file that contains information about how to connect to the Dashboard MongoDB database instance, as well as properties the Hudson collector requires. See the Spring Boot [documentation](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-external-config-application-property-files) for information about sourcing this properties file.
 
+See the Jasypt Spring boot [documentation](https://github.com/ulisesbocchio/jasypt-spring-boot) for more information on configuring encrypted properties and the Jasypt [documentation](http://www.jasypt.org/encrypting-passwords.html) for more information on creating encrypted passwords.
+
 ### Sample application.properties file
 
 ```properties
@@ -39,6 +41,9 @@ dbusername=db
 
 # Database Password - default is blank
 dbpassword=dbpass
+
+#Jasypt encryption password
+jasypt.encryptor.password=password
 
 # Collector schedule (required)
 bamboo.cron=0 0/5 * * * *
