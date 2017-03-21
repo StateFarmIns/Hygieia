@@ -1,12 +1,25 @@
 package com.capitalone.dashboard.event;
 
-import com.capitalone.dashboard.model.*;
-import com.capitalone.dashboard.repository.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.capitalone.dashboard.model.CollectorItem;
+import com.capitalone.dashboard.model.CollectorType;
+import com.capitalone.dashboard.model.Commit;
+import com.capitalone.dashboard.model.CommitType;
+import com.capitalone.dashboard.model.Component;
+import com.capitalone.dashboard.model.Dashboard;
+import com.capitalone.dashboard.model.Pipeline;
+import com.capitalone.dashboard.model.PipelineCommit;
+import com.capitalone.dashboard.model.PipelineStage;
+import com.capitalone.dashboard.repository.CollectorItemRepository;
+import com.capitalone.dashboard.repository.CollectorRepository;
+import com.capitalone.dashboard.repository.ComponentRepository;
+import com.capitalone.dashboard.repository.DashboardRepository;
+import com.capitalone.dashboard.repository.PipelineRepository;
 
 @org.springframework.stereotype.Component
 public class CommitEventListener extends HygieiaMongoEventListener<Commit> {
@@ -33,17 +46,28 @@ public class CommitEventListener extends HygieiaMongoEventListener<Commit> {
         // this commit is part of. But only if there is a build collector item
         // configured on that dashboard. Otherwise, the commit will be orphaned
         // in the commit stage.
-        findAllDashboardsForCommit(commit)
-                .stream()
-                .filter(this::dashboardHasBuildCollector)
-                .forEach(teamDashboard -> {
-                    if (CommitType.New.equals(commit.getType())) {
-                        PipelineCommit pipelineCommit = new PipelineCommit(commit, commit.getScmCommitTimestamp());
-                        Pipeline pipeline = getOrCreatePipeline(teamDashboard);
-                        pipeline.addCommit(PipelineStage.COMMIT.getName(), pipelineCommit);
-                        pipelineRepository.save(pipeline);
-                    }
-                });
+//        findAllDashboardsForCommit(commit)
+//                .stream()
+//                .filter(this::dashboardHasBuildCollector)
+//                .forEach(teamDashboard -> {
+//                    if (CommitType.New.equals(commit.getType())) {
+//                        PipelineCommit pipelineCommit = new PipelineCommit(commit, commit.getScmCommitTimestamp());
+//                        Pipeline pipeline = getOrCreatePipeline(teamDashboard);
+//                        pipeline.addCommit(PipelineStage.COMMIT.getName(), pipelineCommit);
+//                        pipelineRepository.save(pipeline);
+//                    }
+//                });
+        
+        for(Dashboard teamDashboard : findAllDashboardsForCommit(commit)) {
+            if(dashboardHasBuildCollector(teamDashboard)) {
+                if (CommitType.New.equals(commit.getType())) {
+                    PipelineCommit pipelineCommit = new PipelineCommit(commit, commit.getScmCommitTimestamp());
+                    Pipeline pipeline = getOrCreatePipeline(teamDashboard);
+                    pipeline.addCommit(PipelineStage.COMMIT.getName(), pipelineCommit);
+                    pipelineRepository.save(pipeline);
+                }
+            }
+        }
     }
 
     /**
@@ -65,12 +89,20 @@ public class CommitEventListener extends HygieiaMongoEventListener<Commit> {
      * @return true if build CollectorItem found
      */
     private boolean dashboardHasBuildCollector(Dashboard teamDashboard) {
-        return teamDashboard.getApplication().getComponents()
-                .stream()
-                .anyMatch(c -> {
-                    List<CollectorItem> buildCollectorItems = c.getCollectorItems(CollectorType.Build);
-                    return buildCollectorItems != null && !buildCollectorItems.isEmpty();
-                });
+        List<Component> components = teamDashboard.getApplication().getComponents();
+        for(Component c : components) {
+            List<CollectorItem> buildCollectorItems = c.getCollectorItems(CollectorType.Build);
+            if(buildCollectorItems != null && !buildCollectorItems.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+//        return teamDashboard.getApplication().getComponents()
+//                .stream()
+//                .anyMatch(c -> {
+//                    List<CollectorItem> buildCollectorItems = c.getCollectorItems(CollectorType.Build);
+//                    return buildCollectorItems != null && !buildCollectorItems.isEmpty();
+//                });
     }
 
 }
