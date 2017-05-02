@@ -28,7 +28,23 @@
 
         $scope.standardLogin = { name: 'Standard Login', login: authService.login, signup: signup };
         $scope.ldapLogin = { name: 'Ldap Login', login: authService.loginLdap };
-
+        
+        
+        $http({
+        	  method: 'GET',
+        	  url: '/api/authType'
+        	}).then(function successCallback(response) {
+        		if(response.data.includes("LDAP")){
+        			$scope.showLDAPTab = true;
+        			$scope.isStandardLogin = false;
+        		}
+        		if(response.data.includes("STANDARD")){
+        			$scope.showStandardTab = true;
+        			$scope.isStandardLogin = true;
+        		} 
+        	  }, function errorCallback(response) {
+        	    
+        	  });
     }
     app.controller('LoginController', inject.concat([LoginController]));
 })();
