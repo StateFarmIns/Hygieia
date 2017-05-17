@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -83,7 +84,7 @@ public class AuthProperties {
 
 	@PostConstruct
 	public void applyDefaultsIfNeeded() {
-		if (getSecret() == null) {
+		if (StringUtils.isBlank(secret)) {
 			LOGGER.info("No JWT secret found in configuration, generating random secret by default.");
 			setSecret(UUID.randomUUID().toString().replace("-", ""));			
 		}
