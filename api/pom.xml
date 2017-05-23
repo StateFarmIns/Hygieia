@@ -103,11 +103,6 @@
         <artifactId>spring-cloud-starter-config</artifactId>
     </dependency>
 
-	<dependency>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-config-server</artifactId>
-	</dependency>
-
     <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>

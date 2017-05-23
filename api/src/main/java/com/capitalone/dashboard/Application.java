@@ -7,7 +7,6 @@ import javax.servlet.Filter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.context.annotation.Bean;
 
 import com.capitalone.dashboard.config.LoggingFilter;
@@ -29,7 +28,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * Application configuration and bootstrap
  */
 @SpringBootApplication
-@EnableConfigServer
 @EnableSwagger2
 @EnableEncryptableProperties
 public class Application extends SpringBootServletInitializer {
