@@ -50,11 +50,6 @@
               <directory>${project.build.directory}</directory>
               <include>${project.build.finalName}.jar</include>
             </resource>
-             <resource>
-               <targetPath>/</targetPath>
-               <directory>${project.basedir}/src/main/resources</directory>
-               <include>bootstrap.properties</include>
-             </resource>
           </resources>
         </configuration>
       </plugin>
@@ -113,15 +108,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
     </dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-test</artifactId>
-		<scope>test</scope>
-	</dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

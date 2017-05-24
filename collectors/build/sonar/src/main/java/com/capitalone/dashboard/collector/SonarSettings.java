@@ -1,15 +1,13 @@
 package com.capitalone.dashboard.collector;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Bean to hold settings specific to the Sonar collector.
  */
-@RefreshScope
 @Component
 @ConfigurationProperties(prefix = "sonar")
 public class SonarSettings {
