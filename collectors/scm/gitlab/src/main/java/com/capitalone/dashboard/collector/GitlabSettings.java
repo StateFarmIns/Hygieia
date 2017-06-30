@@ -35,6 +35,7 @@ public class GitlabSettings {
     private String apiToken;
 	private int firstRunHistoryDays;
 	private boolean selfSignedCertificate;
+	private int apiVersion;
 
     public String getCron() {
         return cron;
@@ -99,6 +100,14 @@ public class GitlabSettings {
 	public void setSelfSignedCertificate(boolean selfSigned) {
 		this.selfSignedCertificate = selfSigned;
 	}
+	
+    public int getApiVersion() {
+        return apiVersion;
+    }
+
+    public void setApiVersion(int apiVersion) {
+        this.apiVersion = apiVersion;
+    }
 	
 	@PostConstruct
     public void trustSelfSignedCertificatesIfNecessary() {

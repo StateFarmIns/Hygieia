@@ -19,10 +19,12 @@ import com.capitalone.dashboard.model.Collector;
 import com.capitalone.dashboard.model.CollectorItem;
 import com.capitalone.dashboard.model.CollectorType;
 import com.capitalone.dashboard.model.Commit;
+import com.capitalone.dashboard.model.GitRequest;
 import com.capitalone.dashboard.model.GitlabGitRepo;
 import com.capitalone.dashboard.repository.BaseCollectorRepository;
 import com.capitalone.dashboard.repository.CommitRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
+import com.capitalone.dashboard.repository.GitRequestRepository;
 import com.capitalone.dashboard.repository.GitlabGitCollectorRepository;
 
 /**
@@ -42,6 +44,7 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
     private final DefaultGitlabGitClient defaultGitlabGitClient;
     private final ComponentRepository dbComponentRepository;
     private final CommitRepository commitRepository;
+    private final GitRequestRepository gitRequestRepository;
 
 
     @Autowired
@@ -51,7 +54,8 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
                                   CommitRepository commitRepository,
                                   GitlabGitCollectorRepository gitlabGitCollectorRepository,
                                   DefaultGitlabGitClient defaultGitlabGitClient,
-                                  ComponentRepository dbComponentRepository
+                                  ComponentRepository dbComponentRepository,
+                                  GitRequestRepository gitRequestRepository
     ) {
         super(taskScheduler, "Gitlab");
         this.collectorRepository = collectorRepository;
@@ -60,6 +64,7 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
         this.gitlabGitCollectorRepository = gitlabGitCollectorRepository;
         this.defaultGitlabGitClient = defaultGitlabGitClient;
         this.dbComponentRepository = dbComponentRepository;
+        this.gitRequestRepository = gitRequestRepository;
     }
 
 	@Override
@@ -88,6 +93,7 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
         long start = System.currentTimeMillis();
         int repoCount = 0;
         int commitCount = 0;
+        int mergeRequestCount = 0;
 
         clean(collector);
         for (GitlabGitRepo repo : enabledRepos(collector)) {
@@ -101,6 +107,23 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
 				List<Commit> commits = defaultGitlabGitClient.getCommits(repo, firstRun);
 				commitCount = saveNewCommits(commitCount, repo, commits);
 				gitlabGitCollectorRepository.save(repo);
+				
+				List<GitRequest> mergeRequests = defaultGitlabGitClient.getMergeRequests(repo, firstRun);
+	            for (GitRequest mergeRequest : mergeRequests) {
+	                LOG.debug(mergeRequest.getTimestamp()+":::"+mergeRequest.getScmCommitLog());
+	                if (isNewMergeRequest(repo, mergeRequest)) {
+	                    mergeRequest.setCollectorItemId(repo.getId());
+	                    gitRequestRepository.save(mergeRequest);
+	                    mergeRequestCount++;
+	                } else {
+	                    GitRequest existingPull = gitRequestRepository.findByCollectorItemIdAndNumberAndRequestType(repo.getId(), mergeRequest.getNumber(), "pull");
+	                    mergeRequest.setId(existingPull.getId());
+	                    mergeRequest.setCollectorItemId(repo.getId());
+	                    gitRequestRepository.save(mergeRequest);
+	                }
+	            }
+				
+				
 			} catch (HttpClientErrorException | ResourceAccessException e) {
 				LOG.info("Failed to retrieve data, the repo or collector is most likey misconfigured: " + repo.getRepoUrl() + ", " + e.getMessage());
 			}
@@ -109,6 +132,7 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
         }
         log("Repo Count", start, repoCount);
         log("New Commits", start, commitCount);
+        log("New Merge Request", start, mergeRequestCount);
         log("Finished", start);
     }
 
@@ -173,4 +197,9 @@ public class GitlabGitCollectorTask  extends CollectorTask<Collector> {
 		return commitRepository.findByCollectorItemIdAndScmRevisionNumber(repo.getId(),
 				commit.getScmRevisionNumber()) == null;
 	}
+	
+    private boolean isNewMergeRequest(GitlabGitRepo repo, GitRequest pull) {
+        return gitRequestRepository.findByCollectorItemIdAndNumberAndRequestType(
+                repo.getId(), pull.getNumber(), "pull") == null;
+    }
 }

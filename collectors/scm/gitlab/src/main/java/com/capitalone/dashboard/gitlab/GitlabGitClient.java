@@ -3,6 +3,7 @@ package com.capitalone.dashboard.gitlab;
 import java.util.List;
 
 import com.capitalone.dashboard.model.Commit;
+import com.capitalone.dashboard.model.GitRequest;
 import com.capitalone.dashboard.model.GitlabGitRepo;
 
 /**
@@ -22,4 +23,9 @@ public interface GitlabGitClient {
      */
 
 	List<Commit> getCommits(GitlabGitRepo repo, boolean firstRun);
+	
+	List<GitRequest> getIssues();
+	
+	List<GitRequest> getMergeRequests(GitlabGitRepo repo, boolean firstRun);
+	
 }

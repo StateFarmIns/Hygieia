@@ -21,19 +21,22 @@ import com.capitalone.dashboard.model.GitlabGitRepo;
 @Component
 public class GitlabUrlUtility {
 	
-	private static final Log LOG = LogFactory.getLog(GitlabUrlUtility.class);
+    private static final Log LOG = LogFactory.getLog(GitlabUrlUtility.class);
 	
 	private GitlabSettings gitlabSettings;
 	
 	private static final String GIT_EXTENSION = ".git";
 	private static final String DEFAULT_PROTOCOL = "http";
-    private static final String SEGMENT_API = "/api/v3/projects/";
+    private static final String SEGMENT_API = "api";
+    private static final String PROJECTS_SEGMENT = "projects";
 	private static final String COMMITS_API = "/repository/commits/";
 	private static final String DATE_QUERY_PARAM_KEY = "since";
 	private static final String BRANCH_QUERY_PARAM_KEY = "ref_name";
 	private static final String PER_PAGE_QUERY_PARAM_KEY = "per_page";
     private static final String PUBLIC_GITLAB_HOST_NAME = "gitlab.com";
 	private static final int FIRST_RUN_HISTORY_DEFAULT = 14;
+	private static final String V3 = "v3";
+	private static final String V4 = "v4";
 	
 	@Autowired
 	public GitlabUrlUtility(GitlabSettings gitlabSettings) {
@@ -47,6 +50,7 @@ public class GitlabUrlUtility {
         }
         
         String protocol = StringUtils.isBlank(gitlabSettings.getProtocol()) ? DEFAULT_PROTOCOL : gitlabSettings.getProtocol();
+        String apiVersion = gitlabSettings.getApiVersion() == 3 ? V3 : V4;
 		String repoName = getRepoName(repoUrl);
 		String host = getRepoHost();
 		String date = getDateForCommits(repo, firstRun);
@@ -60,7 +64,9 @@ public class GitlabUrlUtility {
 		URI uri = builder.scheme(protocol)
 				.host(host)
 				.path(gitlabSettings.getPath())
-				.path(SEGMENT_API)
+				.pathSegment(SEGMENT_API)
+				.pathSegment(apiVersion)
+				.pathSegment(PROJECTS_SEGMENT)
 				.path(repoName)
 				.path(COMMITS_API)
 				.queryParam(BRANCH_QUERY_PARAM_KEY, repo.getBranch())

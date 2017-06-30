@@ -16,6 +16,7 @@ import org.springframework.web.client.RestOperations;
 import com.capitalone.dashboard.collector.GitlabSettings;
 import com.capitalone.dashboard.gitlab.model.GitlabCommit;
 import com.capitalone.dashboard.model.Commit;
+import com.capitalone.dashboard.model.GitRequest;
 import com.capitalone.dashboard.model.GitlabGitRepo;
 import com.capitalone.dashboard.util.Supplier;
 
@@ -75,5 +76,17 @@ public class DefaultGitlabGitClient implements  GitlabGitClient {
 		headers.add("PRIVATE-TOKEN", apiToken);
 		return restOperations.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), GitlabCommit[].class);
 	}
+
+    @Override
+    public List<GitRequest> getIssues() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<GitRequest> getMergeRequests(GitlabGitRepo repo, boolean firstRun) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

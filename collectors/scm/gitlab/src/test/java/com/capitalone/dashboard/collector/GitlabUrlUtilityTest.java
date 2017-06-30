@@ -37,7 +37,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("gitlab.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
@@ -52,7 +52,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("gitlab.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
@@ -68,7 +68,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("https", result.getScheme());
 		assertEquals("gitlab.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
@@ -84,7 +84,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("customhost.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
@@ -101,7 +101,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("customhost.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertEquals(443, result.getPort());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
@@ -119,7 +119,7 @@ public class GitlabUrlUtilityTest {
         
         assertEquals("http", result.getScheme());
         assertEquals("customhost.com", result.getHost());
-        assertEquals("/gitlab/is/here/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+        assertEquals("/gitlab/is/here/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
         assertTrue(result.getQuery().contains("ref_name=master"));
         assertTrue(result.getQuery().contains("per_page=100"));
         assertTrue(result.getQuery().contains("since="));
@@ -135,7 +135,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("gitlab.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
@@ -151,7 +151,7 @@ public class GitlabUrlUtilityTest {
 		
 		assertEquals("http", result.getScheme());
 		assertEquals("gitlab.com", result.getHost());
-		assertEquals("/api/v3/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
+		assertEquals("/api/v4/projects/namespace%2FHygieia/repository/commits/", result.getRawPath());
 		assertTrue(result.getQuery().contains("ref_name=master"));
 		assertTrue(result.getQuery().contains("per_page=100"));
 		assertTrue(result.getQuery().contains("since="));
