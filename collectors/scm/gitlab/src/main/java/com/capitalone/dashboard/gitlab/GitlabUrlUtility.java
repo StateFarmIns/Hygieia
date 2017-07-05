@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,56 +31,79 @@ public class GitlabUrlUtility {
 	private static final String DEFAULT_PROTOCOL = "http";
     private static final String SEGMENT_API = "api";
     private static final String PROJECTS_SEGMENT = "projects";
+    private static final String MERGE_REQUESTS_SEGMENT = "merge_requests";
 	private static final String COMMITS_API = "/repository/commits/";
 	private static final String DATE_QUERY_PARAM_KEY = "since";
 	private static final String BRANCH_QUERY_PARAM_KEY = "ref_name";
 	private static final String PER_PAGE_QUERY_PARAM_KEY = "per_page";
+	private static final String PAGE_QUERY_PARAM_KEY = "page";
     private static final String PUBLIC_GITLAB_HOST_NAME = "gitlab.com";
 	private static final int FIRST_RUN_HISTORY_DEFAULT = 14;
 	private static final String V3 = "v3";
 	private static final String V4 = "v4";
+	private static final String PRIVATE_TOKEN_HEADER_KEY = "PRIVATE-TOKEN";
 	
 	@Autowired
 	public GitlabUrlUtility(GitlabSettings gitlabSettings) {
 		this.gitlabSettings = gitlabSettings;
 	}
 	
-	public URI buildApiUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
-		String repoUrl = repo.getRepoUrl();
-        if (repoUrl.endsWith(GIT_EXTENSION)) {
-            repoUrl = StringUtils.removeEnd(repoUrl, GIT_EXTENSION);
-        }
-        
-        String protocol = StringUtils.isBlank(gitlabSettings.getProtocol()) ? DEFAULT_PROTOCOL : gitlabSettings.getProtocol();
-        String apiVersion = gitlabSettings.getApiVersion() == 3 ? V3 : V4;
-		String repoName = getRepoName(repoUrl);
-		String host = getRepoHost();
-		String date = getDateForCommits(repo, firstRun);
-
-		UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-		
-		if(StringUtils.isNotBlank(gitlabSettings.getPort())) {
-		    builder.port(gitlabSettings.getPort());
-		}
-		
-		URI uri = builder.scheme(protocol)
-				.host(host)
-				.path(gitlabSettings.getPath())
-				.pathSegment(SEGMENT_API)
-				.pathSegment(apiVersion)
-				.pathSegment(PROJECTS_SEGMENT)
-				.path(repoName)
-				.path(COMMITS_API)
-				.queryParam(BRANCH_QUERY_PARAM_KEY, repo.getBranch())
-				.queryParam(DATE_QUERY_PARAM_KEY, date)
-				.queryParam(PER_PAGE_QUERY_PARAM_KEY, resultsPerPage)
+	   public URI updatePage(URI uri, String page) {
+	        return UriComponentsBuilder.fromUri(uri).queryParam(PAGE_QUERY_PARAM_KEY, page).build(true).toUri();
+	    }
+	
+	public URI buildCommitsUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
+       
+        String date = getDateForCommits(repo, firstRun);
+	    
+	    UriComponentsBuilder builder = buildProjectsUrl(repo, firstRun, resultsPerPage);
+	    
+        URI uri = builder.path(COMMITS_API)
+                .queryParam(DATE_QUERY_PARAM_KEY, date)
+                .queryParam(BRANCH_QUERY_PARAM_KEY, repo.getBranch())
 				.build(true).toUri();
 
 		return uri;
     }
+	
+    public URI buildMergeRequestUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
+        UriComponentsBuilder builder = buildProjectsUrl(repo, firstRun, resultsPerPage);
+        URI uri = builder.pathSegment(MERGE_REQUESTS_SEGMENT)
+                .build(true).toUri();
+        
+        return uri;
+    }
 
 	public URI updatePage(URI uri, int nextPage) {
 		return UriComponentsBuilder.fromUri(uri).replaceQueryParam("page", nextPage).build(true).toUri();
+	}
+	
+	private UriComponentsBuilder buildProjectsUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
+	    String repoUrl = repo.getRepoUrl();
+        if (repoUrl.endsWith(GIT_EXTENSION)) {
+            repoUrl = StringUtils.removeEnd(repoUrl, GIT_EXTENSION);
+        }
+        String repoName = getRepoName(repoUrl);
+        String protocol = StringUtils.isBlank(gitlabSettings.getProtocol()) ? DEFAULT_PROTOCOL : gitlabSettings.getProtocol();
+        String apiVersion = gitlabSettings.getApiVersion() == 3 ? V3 : V4;
+        String host = getRepoHost();
+
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
+        
+        if(StringUtils.isNotBlank(gitlabSettings.getPort())) {
+            builder.port(gitlabSettings.getPort());
+        }
+        
+        UriComponentsBuilder uri = builder.scheme(protocol)
+                .host(host)
+                .path(gitlabSettings.getPath())
+                .pathSegment(SEGMENT_API)
+                .pathSegment(apiVersion)
+                .pathSegment(PROJECTS_SEGMENT)
+                .path(repoName)
+                .queryParam(PER_PAGE_QUERY_PARAM_KEY, resultsPerPage);
+        
+        return uri;
 	}
 
 	private String getRepoHost() {
@@ -129,5 +154,12 @@ public class GitlabUrlUtility {
 		cal.add(Calendar.MINUTE, offsetMinutes);
 		return cal.getTime();
 	}
+	
+	   public HttpEntity<String> buildAuthenticationHeader() {
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.set(PRIVATE_TOKEN_HEADER_KEY, gitlabSettings.getApiToken());
+	        HttpEntity<String> headersEntity = new HttpEntity<>(headers);
+	        return headersEntity;
+	    }
 
 }

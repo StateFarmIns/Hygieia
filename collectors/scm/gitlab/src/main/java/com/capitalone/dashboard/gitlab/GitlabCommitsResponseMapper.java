@@ -14,7 +14,7 @@ import com.capitalone.dashboard.model.CommitType;
 @Component
 public class GitlabCommitsResponseMapper {
     
-    public List<Commit> map(GitlabCommit[] gitlabCommits, String repoUrl, String branch) {
+    public List<Commit> map(List<GitlabCommit> gitlabCommits, String repoUrl, String branch) {
         List<Commit> commits = new ArrayList<>();
         for (GitlabCommit gitlabCommit : gitlabCommits) {
             commits.add(map(repoUrl, branch, gitlabCommit));     

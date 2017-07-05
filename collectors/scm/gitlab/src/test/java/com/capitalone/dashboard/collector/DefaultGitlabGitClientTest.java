@@ -76,7 +76,7 @@ public class DefaultGitlabGitClientTest {
 
 	@Test
 	public void shouldGetNoCommits() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(GitlabCommit[].class))).thenReturn(response);
 		List<Commit> commits = gitlabClient.getCommits(repo, true);
 		
@@ -85,7 +85,7 @@ public class DefaultGitlabGitClientTest {
 	
 	@Test
 	public void shouldGetOnePageOfCommits() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(GitlabCommit[].class))).thenReturn(response);
 		List<Commit> pageOfCommits = new ArrayList<Commit>();
 		pageOfCommits.add(new Commit());
@@ -99,7 +99,7 @@ public class DefaultGitlabGitClientTest {
 	
 	@Test
 	public void shouldGetMultiplePagesOfCommits() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		when(gitlabUrlUtility.updatePage(isA(URI.class), anyInt())).thenReturn(apiUrl);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(GitlabCommit[].class))).thenReturn(response);
 		List<Commit> firstPageOfCommits = new ArrayList<Commit>();
@@ -119,7 +119,7 @@ public class DefaultGitlabGitClientTest {
 	
 	@Test(expected = HttpClientErrorException.class)
 	public void shouldLogException() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(GitlabCommit[].class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 		
 		gitlabClient.getCommits(repo, true);
@@ -129,7 +129,7 @@ public class DefaultGitlabGitClientTest {
 	
 	@Test
 	public void shouldUseApiTokenIfProvided() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		ArgumentCaptor<HttpEntity> captor = ArgumentCaptor.forClass(HttpEntity.class);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), captor.capture(), eq(GitlabCommit[].class))).thenReturn(response);
 		String expectedApiKey = "fakeApiKey";
@@ -142,7 +142,7 @@ public class DefaultGitlabGitClientTest {
 	
 	@Test
 	public void shouldUseCollectorsApiTokenIfNotProvided() {
-		when(gitlabUrlUtility.buildApiUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
+		when(gitlabUrlUtility.buildCommitsUrl(isA(GitlabGitRepo.class), eq(true), anyInt())).thenReturn(apiUrl);
 		ArgumentCaptor<HttpEntity> captor = ArgumentCaptor.forClass(HttpEntity.class);
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), captor.capture(), eq(GitlabCommit[].class))).thenReturn(response);
 		String expectedApiKey = "fakeApiKey";
