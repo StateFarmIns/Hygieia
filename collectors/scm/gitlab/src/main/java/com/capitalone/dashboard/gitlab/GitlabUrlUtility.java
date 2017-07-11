@@ -56,7 +56,7 @@ public class GitlabUrlUtility {
        
         String date = getDateForCommits(repo, firstRun);
 	    
-	    UriComponentsBuilder builder = buildProjectsUrl(repo, firstRun, resultsPerPage);
+	    UriComponentsBuilder builder = buildProjectsUrl(repo, resultsPerPage);
 	    
         URI uri = builder.path(COMMITS_API)
                 .queryParam(DATE_QUERY_PARAM_KEY, date)
@@ -67,7 +67,7 @@ public class GitlabUrlUtility {
     }
 	
     public URI buildMergeRequestUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
-        UriComponentsBuilder builder = buildProjectsUrl(repo, firstRun, resultsPerPage);
+        UriComponentsBuilder builder = buildProjectsUrl(repo, resultsPerPage);
         URI uri = builder.pathSegment(MERGE_REQUESTS_SEGMENT)
                 .build(true).toUri();
         
@@ -78,7 +78,7 @@ public class GitlabUrlUtility {
 		return UriComponentsBuilder.fromUri(uri).replaceQueryParam("page", nextPage).build(true).toUri();
 	}
 	
-	private UriComponentsBuilder buildProjectsUrl(GitlabGitRepo repo, boolean firstRun, int resultsPerPage) {
+	private UriComponentsBuilder buildProjectsUrl(GitlabGitRepo repo, int resultsPerPage) {
 	    String repoUrl = repo.getRepoUrl();
         if (repoUrl.endsWith(GIT_EXTENSION)) {
             repoUrl = StringUtils.removeEnd(repoUrl, GIT_EXTENSION);

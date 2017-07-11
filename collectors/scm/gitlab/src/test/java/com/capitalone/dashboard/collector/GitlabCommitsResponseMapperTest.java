@@ -8,17 +8,18 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.capitalone.dashboard.gitlab.GitlabCommitsResponseMapper;
+import com.capitalone.dashboard.gitlab.GitlabResponseMapper;
 import com.capitalone.dashboard.gitlab.model.GitlabCommit;
 import com.capitalone.dashboard.model.Commit;
+import com.google.common.collect.Lists;
 
 public class GitlabCommitsResponseMapperTest {
 	
-	private GitlabCommitsResponseMapper gitlabResponseMapper;
+	private GitlabResponseMapper gitlabResponseMapper;
 	
 	@Before
 	public void setup() {
-		gitlabResponseMapper = new GitlabCommitsResponseMapper();
+		gitlabResponseMapper = new GitlabResponseMapper();
 	}
 
 	@Test
@@ -30,12 +31,12 @@ public class GitlabCommitsResponseMapperTest {
 		gitlabCommit.setAuthorName("fake author");
 		gitlabCommit.setMessage("message");
         gitlabCommit.setCreatedAt(createdAt);
-		GitlabCommit[] gitlabCommits = {gitlabCommit};
+		List<GitlabCommit> gitlabCommits = Lists.newArrayList(gitlabCommit);
 		
 		String repoUrl = "http://domain.com";
 		String repoBranch = "master";
 		long timestamp = new DateTime(createdAt).getMillis();
-		List<Commit> commits = gitlabResponseMapper.map(gitlabCommits, repoUrl, repoBranch);
+		List<Commit> commits = gitlabResponseMapper.mapCommits(gitlabCommits, repoUrl, repoBranch);
 		Commit commit = commits.get(0);
 		
 		assertEquals(repoUrl, commit.getScmUrl());

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -30,9 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 
-import com.capitalone.dashboard.collector.GitlabSettings;
 import com.capitalone.dashboard.gitlab.DefaultGitlabGitClient;
-import com.capitalone.dashboard.gitlab.GitlabCommitsResponseMapper;
+import com.capitalone.dashboard.gitlab.GitlabResponseMapper;
 import com.capitalone.dashboard.gitlab.GitlabUrlUtility;
 import com.capitalone.dashboard.gitlab.model.GitlabCommit;
 import com.capitalone.dashboard.model.Commit;
@@ -61,7 +61,7 @@ public class DefaultGitlabGitClientTest {
 	private ResponseEntity<GitlabCommit[]> response;
 	
 	@Mock
-	private GitlabCommitsResponseMapper responseMapper;
+	private GitlabResponseMapper responseMapper;
 	
 	private URI apiUrl;
 	
@@ -70,7 +70,7 @@ public class DefaultGitlabGitClientTest {
 	@Before
 	public void setup() throws URISyntaxException {
 		when(restOperationsSupplier.get()).thenReturn(restOperations);
-		gitlabClient = new DefaultGitlabGitClient(gitlabUrlUtility, gitlabSettings, restOperationsSupplier, responseMapper);
+		gitlabClient = new DefaultGitlabGitClient(gitlabUrlUtility, restOperationsSupplier, responseMapper);
 		apiUrl = new URI("http://google.com");
 	}
 
@@ -89,7 +89,7 @@ public class DefaultGitlabGitClientTest {
 		when(restOperations.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(GitlabCommit[].class))).thenReturn(response);
 		List<Commit> pageOfCommits = new ArrayList<Commit>();
 		pageOfCommits.add(new Commit());
-		when(responseMapper.map(eq(response.getBody()), anyString(), anyString())).thenReturn(pageOfCommits);
+		when(responseMapper.mapCommits(anyList(), anyString(), anyString())).thenReturn(pageOfCommits);
 		
 		List<Commit> commits = gitlabClient.getCommits(repo, true);
 		
@@ -108,7 +108,7 @@ public class DefaultGitlabGitClientTest {
 		}
 		ArrayList<Commit> secondPageOfCommits = new ArrayList<>();
 		secondPageOfCommits.add(new Commit());
-		when(responseMapper.map(eq(response.getBody()), anyString(), anyString())).thenReturn(firstPageOfCommits).thenReturn(secondPageOfCommits);
+		when(responseMapper.mapCommits(anyList(), anyString(), anyString())).thenReturn(firstPageOfCommits).thenReturn(secondPageOfCommits);
 		
 		List<Commit> commits = gitlabClient.getCommits(repo, true);
 		
@@ -124,7 +124,7 @@ public class DefaultGitlabGitClientTest {
 		
 		gitlabClient.getCommits(repo, true);
 		
-		verify(responseMapper, never()).map(isA(GitlabCommit[].class), anyString(), anyString());
+		verify(responseMapper, never()).mapCommits(anyList(), anyString(), anyString());
 	}
 	
 	@Test

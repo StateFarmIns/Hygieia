@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 
-import com.capitalone.dashboard.collector.GitlabSettings;
 import com.capitalone.dashboard.gitlab.model.GitlabCommit;
 import com.capitalone.dashboard.gitlab.model.GitlabMergeRequest;
 import com.capitalone.dashboard.model.Commit;
@@ -33,16 +32,13 @@ public class DefaultGitlabGitClient implements  GitlabGitClient {
     
     private final RestOperations restOperations;
     private final GitlabUrlUtility gitlabUrlUtility;
-    private final GitlabSettings gitlabSettings;
-    private final GitlabCommitsResponseMapper responseMapper;
+    private final GitlabResponseMapper responseMapper;
     
     @Autowired
-    public DefaultGitlabGitClient(GitlabUrlUtility gitlabUrlUtility, 
-    								   GitlabSettings gitlabSettings,
+    public DefaultGitlabGitClient(GitlabUrlUtility gitlabUrlUtility,
                                        Supplier<RestOperations> restOperationsSupplier,
-                                       GitlabCommitsResponseMapper responseMapper) {
+                                       GitlabResponseMapper responseMapper) {
         this.gitlabUrlUtility = gitlabUrlUtility;
-        this.gitlabSettings = gitlabSettings;
         this.restOperations = restOperationsSupplier.get();
         this.responseMapper = responseMapper;
     }
@@ -53,7 +49,7 @@ public class DefaultGitlabGitClient implements  GitlabGitClient {
 
 		URI uri = gitlabUrlUtility.buildCommitsUrl(repo, firstRun, RESULTS_PER_PAGE);
 		List<GitlabCommit> gitlabCommits = makePaginatedGitlabRequest(uri, GitlabCommit[].class);
-		commits.addAll(responseMapper.map(gitlabCommits, repo.getRepoUrl(), repo.getBranch()));
+		commits.addAll(responseMapper.mapCommits(gitlabCommits, repo.getRepoUrl(), repo.getBranch()));
 		
         return commits;
     }
@@ -67,8 +63,10 @@ public class DefaultGitlabGitClient implements  GitlabGitClient {
     @Override
     public List<GitRequest> getMergeRequests(GitlabGitRepo repo, boolean firstRun) {
         List<GitRequest> mergeRequests = new ArrayList<>();
+        
         URI uri = gitlabUrlUtility.buildMergeRequestUrl(repo, firstRun, RESULTS_PER_PAGE);
         List<GitlabMergeRequest> gitlabMergeRequests =  makePaginatedGitlabRequest(uri, GitlabMergeRequest[].class);
+        mergeRequests.addAll(responseMapper.mapMergeRequests(gitlabMergeRequests, repo.getRepoUrl(), repo.getBranch()));
         
         return mergeRequests;
     }
